@@ -60,7 +60,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
         ),
       );
       
-      context.go('/products'); //los nuevos productos se obtienen con la paginación usando el paginación usando el ScrollController
+      context.go('/products'); //los nuevos productos se obtienen con la paginación usando el ScrollController
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(error), backgroundColor: Colors.red),
