@@ -2,13 +2,19 @@ import 'package:dio/dio.dart';
 import 'package:parcial_2/helpers/interceptor.dart';
 import 'package:parcial_2/model/product_model.dart';
 
+
 class ProductService {
   static final dio = Dio()..interceptors.add(AuthInterceptor());
   static final url = 'https://api.escuelajs.co/api/v1';
 
-  static Future<List<ProductModel>> getProducts() async {
+  static Future<List<ProductModel>> getProducts({
+    int offset = 0,
+    int limit = 8,
+  }) async {
     try {
-      final Response response = await dio.get('$url/products');
+      final Response response = await dio.get(
+        '$url/products?offset=$offset&limit=$limit',
+      );
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data;
         return data.map((item) => ProductModel.fromJson(item)).toList();
@@ -31,13 +37,12 @@ class ProductService {
         '$url/products/',
         data: {
           'title': title,
-          'price': price,        
+          'price': price,
           'description': description,
           'categoryId': categoryId,
           'images': [imageUrl],
         },
       );
-
       if (response.statusCode == 200 || response.statusCode == 201) {
         return null;
       }

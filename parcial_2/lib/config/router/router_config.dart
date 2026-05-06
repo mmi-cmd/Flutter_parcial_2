@@ -3,6 +3,7 @@ import 'package:parcial_2/config/router/router_model.dart';
 import 'package:parcial_2/presentation/screen/home/home.dart';
 import 'package:parcial_2/presentation/screen/products/product_form_screen.dart';
 import 'package:parcial_2/presentation/screen/products/products_screen.dart';
+import 'package:parcial_2/presentation/screen/settings/settings_screen.dart';
 import 'package:parcial_2/presentation/screen/user/user_screen.dart';
 
 
@@ -29,7 +30,7 @@ List<RouterModel> routerConfig = [
   title: 'Products',
   description: 'Lista de productos',
   path: '/products',
-  widget: (context, state) => ProductsScreen(key: ValueKey(DateTime.now().millisecondsSinceEpoch)),
+  widget: (context, state) => ProductsScreen(),
 ),
 
   RouterModel(
@@ -40,4 +41,11 @@ List<RouterModel> routerConfig = [
     widget: (context, state) => const ProductFormScreen(),
   ),
 
+  RouterModel(
+    name: 'Settings',
+    title: 'Configuración',
+    description: 'Configurar preferencias de la aplicación',
+    path: '/settings',
+    widget: (context, state) => const SettingsScreen(),
+  ),
 ];

@@ -12,37 +12,55 @@ class ProductsScreen extends StatefulWidget {
 
 class _ProductsScreenState extends State<ProductsScreen> {
   List<ProductModel> _products = [];
-  bool _loading = true;
+  bool _loading = false;
+  bool _hasMore = true; // si hay más productos por cargar
+  int _offset = 0;
+  static const int _limit = 8;
+  final ScrollController _sc = ScrollController();
   String? _error;
 
   @override
   void initState() {
     super.initState();
     _loadProducts();
+    _sc.addListener(() {
+      // Cuando el scroll llega cerca del final, carga más
+      if (_sc.position.pixels >= _sc.position.maxScrollExtent - 200) {
+        _loadProducts();
+      }
+    });
   }
 
-  // Se llama cada vez que la pantalla vuelve a ser visible
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (!_loading) {
-      _loadProducts();
-    }
+  void dispose() {
+    _sc.dispose();
+    super.dispose();
   }
 
   Future<void> _loadProducts() async {
+    if (_loading || !_hasMore) return; // evita llamadas duplicadas
+    print('>>> Haciendo GET — offset: $_offset, limit: $_limit');
+
     setState(() {
       _loading = true;
       _error = null;
     });
+
     try {
-      final products = await ProductService.getProducts();
+      final products = await ProductService.getProducts(
+        offset: _offset,
+        limit: _limit,
+      );
+      print('>>> Productos recibidos: ${products.length}');
       if (!mounted) return;
       setState(() {
-        _products = products;
+        _offset += products.length;
+        _products.addAll(products); // agrega al final en lugar de reemplazar
+        _hasMore = products.length == _limit; // si recibió menos del límite, no hay más
         _loading = false;
       });
     } catch (e) {
+      print('>>> Error: $e');
       if (!mounted) return;
       setState(() {
         _error = e.toString();
@@ -51,13 +69,19 @@ class _ProductsScreenState extends State<ProductsScreen> {
     }
   }
 
+  // Recarga desde cero (pull to refresh)
+  Future<void> _refresh() async {
+    setState(() {
+      _products = [];
+      _offset = 0;
+      _hasMore = true;
+    });
+    await _loadProducts();
+  }
+
   @override
   Widget build(BuildContext context) {
-    if (_loading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    if (_error != null) {
+    if (_error != null && _products.isEmpty) {
       return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -66,21 +90,27 @@ class _ProductsScreenState extends State<ProductsScreen> {
             const SizedBox(height: 12),
             Text(_error!),
             const SizedBox(height: 12),
-            FilledButton(
-              onPressed: _loadProducts,
-              child: const Text('Reintentar'),
-            ),
+            FilledButton(onPressed: _refresh, child: const Text('Reintentar')),
           ],
         ),
       );
     }
 
     return RefreshIndicator(
-      onRefresh: _loadProducts,
+      onRefresh: _refresh,
       child: ListView.builder(
+        controller: _sc,
         padding: const EdgeInsets.all(12),
-        itemCount: _products.length,
+        // +1 para el indicador de carga al final
+        itemCount: _products.length + (_loading ? 1 : 0),
         itemBuilder: (context, index) {
+          // Último item — muestra el spinner de carga
+          if (index == _products.length) {
+            return const Padding(
+              padding: EdgeInsets.symmetric(vertical: 16),
+              child: Center(child: CircularProgressIndicator()),
+            );
+          }
           return _ProductCard(product: _products[index]);
         },
       ),
@@ -108,10 +138,8 @@ class _ProductCard extends StatelessWidget {
                 ? Image.network(
                     product.image,
                     fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => const Icon(
-                      Icons.image_not_supported_outlined,
-                      size: 40,
-                    ),
+                    errorBuilder: (_, __, ___) =>
+                        const Icon(Icons.image_not_supported_outlined, size: 40),
                   )
                 : const Icon(Icons.image_not_supported_outlined, size: 40),
           ),
@@ -130,12 +158,10 @@ class _ProductCard extends StatelessWidget {
                       ),
                     ),
                   const SizedBox(height: 4),
-                  Text(
-                    product.title,
-                    style: theme.textTheme.titleSmall,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                  Text(product.title,
+                      style: theme.textTheme.titleSmall,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis),
                   const SizedBox(height: 8),
                   Text(
                     '\$${product.price.toStringAsFixed(2)}',
