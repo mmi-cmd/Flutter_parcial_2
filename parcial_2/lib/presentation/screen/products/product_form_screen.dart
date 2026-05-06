@@ -59,8 +59,8 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           backgroundColor: Colors.green,
         ),
       );
-      // push en lugar de go — así ProductsScreen llama didChangeDependencies al volver
-      context.go('/products');
+      
+      context.go('/products'); //los nuevos productos se obtienen con la paginación usando el paginación usando el ScrollController
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(error), backgroundColor: Colors.red),
