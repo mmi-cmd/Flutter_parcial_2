@@ -49,30 +49,45 @@ class DrawerCustom extends StatelessWidget {
                           color: Theme.of(context).colorScheme.surface,
                         ),
                       ),
+
                       const SizedBox(width: 12),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Mi App',
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.surface,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
+
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Ingeniería de sistemas',
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.surface,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                          const Text(
-                            'Ingeniería de sistemas',
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 13,
+
+                            const Text(
+                              'José García  - 0192349',
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 13,
+                              ),
+                              overflow: TextOverflow.ellipsis,
                             ),
-                          ),
-                        ],
+
+                            const Text(
+                              'Michell Pérez - 0199999',
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 13,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
                       ),
                     ],
-                  ),
+                  )
                 ),
                 // ── Rutas ───────────────────────────────────────────
                 ...routerConfig.map((route) {
