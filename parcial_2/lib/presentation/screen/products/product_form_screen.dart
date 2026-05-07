@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:parcial_2/service/product_service.dart';
 
 
@@ -59,8 +58,16 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           backgroundColor: Colors.green,
         ),
       );
-      // push en lugar de go — así ProductsScreen llama didChangeDependencies al volver
-      context.go('/products');
+      // Limpia el form
+      _formKey.currentState!.reset();
+      _titleController.clear();
+      _priceController.clear();
+      _descriptionController.clear();
+      _imageController.clear();
+      setState(() => _categoryId = 1);
+
+      // Vuelve al tab 0 (lista de productos)
+      DefaultTabController.of(context).animateTo(1);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(error), backgroundColor: Colors.red),
@@ -142,6 +149,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                 labelText: 'URL de imagen',
                 prefixIcon: Icon(Icons.image_outlined),
                 border: OutlineInputBorder(),
+                hintText: 'https://i.imgur.com/QkIa5tT.jpeg',
               ),
               keyboardType: TextInputType.url,
               validator: (v) {

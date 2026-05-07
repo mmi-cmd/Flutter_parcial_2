@@ -25,6 +25,18 @@ class ProductService {
     }
   }
 
+  static Future<ProductModel?> getProductById(int id) async {
+    try {
+      final Response response = await dio.get('$url/products/$id');
+      if (response.statusCode == 200) {
+        return ProductModel.fromJson(response.data);
+      }
+      return null;
+    } on DioException catch (_) {
+      return null;
+    }
+  }
+
   static Future<String?> createProduct({
     required String title,
     required double price,
@@ -43,9 +55,12 @@ class ProductService {
           'images': [imageUrl],
         },
       );
+       print('>>> Status: ${response.statusCode}');
+  print('>>> Body: ${response.data}');
       if (response.statusCode == 200 || response.statusCode == 201) {
         return null;
       }
+    
       return 'Error al crear producto';
     } on DioException catch (e) {
       return e.error?.toString() ?? 'Error al crear producto';

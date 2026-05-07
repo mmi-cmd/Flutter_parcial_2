@@ -29,6 +29,7 @@ class AuthInterceptor extends Interceptor {
       errorMessage = 'Error de conexión. Revisa tu conexión a internet.';
     } else if (err.type == DioExceptionType.badResponse) {
       final statusCode = err.response?.statusCode;
+        print('>>> Error body: ${err.response?.data}');
       if (statusCode == 400) {
         errorMessage = 'Petición incorrecta.';
       } else if (statusCode == 401) {

@@ -3,7 +3,8 @@ class ProductModel {
   final String title;
   final double price;
   final String description;
-  final String image;
+  final String image;       // thumbnail — para la lista
+  final List<String> images; // todas las imágenes — para el detalle
   final String category;
 
   ProductModel({
@@ -12,20 +13,19 @@ class ProductModel {
     required this.price,
     required this.description,
     required this.image,
+    required this.images,
     required this.category,
   });
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
-    // images es una List<dynamic> — tomamos la primera
-    final images = json['images'] as List<dynamic>? ?? [];
-    final rawImage = images.isNotEmpty ? images.first.toString() : '';
-    // La API a veces devuelve la URL con comillas o corchetes extra: ["https://..."]
-    final cleanImage = rawImage
-        .replaceAll('"', '')
-        .replaceAll('[', '')
-        .replaceAll(']', '');
+    final rawImages = json['images'] as List<dynamic>? ?? [];
+    final cleanImages = rawImages.map((img) {
+      return img.toString()
+          .replaceAll('"', '')
+          .replaceAll('[', '')
+          .replaceAll(']', '');
+    }).toList();
 
-    // category es un Map: { "id": 1, "name": "Clothes" }
     final categoryData = json['category'];
     final categoryName = categoryData is Map
         ? (categoryData['name'] ?? '').toString()
@@ -36,7 +36,8 @@ class ProductModel {
       title: json['title'] ?? 'Sin título',
       price: (json['price'] ?? 0).toDouble(),
       description: json['description'] ?? '',
-      image: cleanImage,
+      image: cleanImages.isNotEmpty ? cleanImages.first : '',
+      images: cleanImages,
       category: categoryName,
     );
   }
