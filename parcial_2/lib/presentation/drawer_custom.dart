@@ -76,7 +76,7 @@ class DrawerCustom extends StatelessWidget {
                             ),
 
                             const Text(
-                              'Michell Pérez - 0199999',
+                              'Michell Pérez - 0192354',
                               style: TextStyle(
                                 color: Colors.white70,
                                 fontSize: 13,
