@@ -55,8 +55,8 @@ class ProductService {
           'images': [imageUrl],
         },
       );
-       print('>>> Status: ${response.statusCode}');
-  print('>>> Body: ${response.data}');
+       print('Status: ${response.statusCode}');
+        print('Body: ${response.data}');
       if (response.statusCode == 200 || response.statusCode == 201) {
         return null;
       }

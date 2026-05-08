@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:parcial_2/model/product_model.dart';
 import 'package:parcial_2/service/product_service.dart';
 
@@ -55,7 +56,13 @@ class _ProductDetailViewState extends State<_ProductDetailView> {
     final images = widget.images;
 
     return Scaffold(
-      appBar: AppBar(title: Text(product.title)),
+  appBar: AppBar(
+        title: Text(product.title),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.go('/products'),
+        ),
+      ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

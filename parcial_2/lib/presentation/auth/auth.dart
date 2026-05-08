@@ -14,107 +14,172 @@ class _AuthState extends State<Auth> {
   final _userController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _loading = false;
+  bool _obscurePassword = true;
 
   void _login(BuildContext context) async {
     if (!_formKey.currentState!.validate()) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Please finish all field')));
+      ).showSnackBar(const SnackBar(content: Text('Please finish all fields')));
       return;
     }
 
-    setState(() {
-      _loading = true;
-    });
+    setState(() => _loading = true);
+
+    final messenger = ScaffoldMessenger.of(context);
+    final router = GoRouter.of(context);
 
     final error = await AuthService.getToken(
       _userController.text,
       _passwordController.text,
     );
 
-    // Es importante asegurarse que el widget todavía está montado antes de usar el context
     if (!mounted) return;
 
     if (error == null) {
-      // Éxito
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Logeado correctamente')));
-      setState(() {
-        _loading = false;
-        
-      });
-      context.go('/users'); // Redirigir a la pantalla de inicio después del login exitoso 
+      messenger.showSnackBar(
+        const SnackBar(content: Text('Logeado correctamente')),
+      );
+      setState(() => _loading = false);
+      router.go('/users');
     } else {
-      // Fallo
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(error)));
-      setState(() {
-        _loading = false;
-      });
+      messenger.showSnackBar(SnackBar(content: Text(error)));
+      setState(() => _loading = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      body: SingleChildScrollView(
-        child: SafeArea(
-          child: Column(
-            children: [
-              Padding(
-                padding: EdgeInsets.all(16.0),
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Parte superior
+            Expanded(
+              flex: 2,
+              child: Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary,
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(40),
+                    bottomRight: Radius.circular(40),
+                  ),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircleAvatar(
+                      radius: 48,
+                      backgroundColor: Colors.white24,
+                      child: Icon(
+                        Icons.storefront_outlined,
+                        size: 52,
+                        color: theme.colorScheme.onPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Mi Tienda',
+                      style: theme.textTheme.headlineMedium?.copyWith(
+                        color: theme.colorScheme.onPrimary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Inicia sesión para continuar',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.onPrimary.withValues(
+                          alpha: 0.8,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // Formulario
+            Expanded(
+              flex: 3,
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(24),
                 child: Form(
                   key: _formKey,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      const SizedBox(height: 16),
                       TextFormField(
                         controller: _userController,
-                        decoration: const InputDecoration(
-                          labelText: 'Username',
-                          prefixIcon: Icon(Icons.person),
+                        decoration: InputDecoration(
+                          labelText: 'Usuario',
+                          prefixIcon: const Icon(Icons.person_outline),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
                         keyboardType: TextInputType.text,
-                        validator: (value) {
-                          return value == null || value.isEmpty
-                              ? 'Email is required'
-                              : null;
-                        },
+                        validator: (value) => value == null || value.isEmpty
+                            ? 'El usuario es requerido'
+                            : null,
                       ),
                       const SizedBox(height: 16),
                       TextFormField(
                         controller: _passwordController,
-                        decoration: const InputDecoration(
-                          labelText: 'Password',
-                          prefixIcon: Icon(Icons.lock),
+                        decoration: InputDecoration(
+                          labelText: 'Contraseña',
+                          prefixIcon: const Icon(Icons.lock_outline),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscurePassword
+                                  ? Icons.visibility_off_outlined
+                                  : Icons.visibility_outlined,
+                            ),
+                            onPressed: () => setState(
+                              () => _obscurePassword = !_obscurePassword,
+                            ),
+                          ),
                         ),
-                        keyboardType: TextInputType.text,
-                        obscureText: true,
-                        validator: (value) {
-                          return value == null || value.isEmpty
-                              ? 'Password is required'
-                              : null;
-                        },
+                        obscureText: _obscurePassword,
+                        validator: (value) => value == null || value.isEmpty
+                            ? 'La contraseña es requerida'
+                            : null,
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 32),
                       SizedBox(
                         width: double.infinity,
+                        height: 52,
                         child: FilledButton.icon(
-                          label: Text('Login'),
                           onPressed: _loading ? null : () => _login(context),
                           icon: _loading
-                              ? CircularProgressIndicator()
-                              : Icon(Icons.login),
+                              ? const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : const Icon(Icons.login),
+                          label: Text(
+                            _loading ? 'Ingresando...' : 'Iniciar sesión',
+                            style: const TextStyle(fontSize: 16),
+                          ),
                         ),
                       ),
                     ],
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

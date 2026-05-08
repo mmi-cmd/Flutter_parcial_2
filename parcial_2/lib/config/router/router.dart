@@ -31,6 +31,15 @@ final GoRouter router = GoRouter(
       builder: (context, state) => const Auth(),
     ),
 
+    GoRoute(
+          path: '/products/:id',
+          name: 'ProductDetail',
+          builder: (context, state) {
+            final id = int.parse(state.pathParameters['id']!);
+            return ProductDetailScreen(id: id);
+          },
+        ),
+
     // Rutas protegidas dentro del ShellRoute (tienen layout + drawer)
     ShellRoute(
       builder: (context, state, child) {
@@ -44,15 +53,6 @@ final GoRouter router = GoRouter(
           builder: route.widget,
         )),
 
-        // Detalle de producto — dentro del shell para mantener el drawer
-        GoRoute(
-          path: '/products/:id',
-          name: 'ProductDetail',
-          builder: (context, state) {
-            final id = int.parse(state.pathParameters['id']!);
-            return ProductDetailScreen(id: id);
-          },
-        ),
       ],
     ),
   ],

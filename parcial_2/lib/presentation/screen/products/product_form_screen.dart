@@ -58,7 +58,10 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           backgroundColor: Colors.green,
         ),
       );
+<<<<<<< HEAD
 
+=======
+>>>>>>> 95be59b (updates)
       // Limpia el form
       _formKey.currentState!.reset();
       _titleController.clear();
@@ -69,9 +72,12 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
       // Vuelve al tab 0 (lista de productos)
       DefaultTabController.of(context).animateTo(1);
+<<<<<<< HEAD
 
       //context.go('/products'); //los nuevos productos se obtienen con la paginación usando el ScrollController
 
+=======
+>>>>>>> 95be59b (updates)
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(error), backgroundColor: Colors.red),
